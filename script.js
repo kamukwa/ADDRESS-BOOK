@@ -1,4 +1,4 @@
-// Business logic
+// Address Book Logic
 function Contact(name, email, phone, address) {
     this.name = name;
     this.email = email;
@@ -20,15 +20,40 @@ function Contact(name, email, phone, address) {
     }
   };
   
-  // UI logic
+  // Places Logic
+  function Place(name, location, landmarks, season, notes) {
+    this.name = name;
+    this.location = location;
+    this.landmarks = landmarks;
+    this.season = season;
+    this.notes = notes;
+  }
+  
+  function PlacesList() {
+    this.places = [];
+  }
+  
+  PlacesList.prototype.addPlace = function(place) {
+    this.places.push(place);
+  };
+  
+  PlacesList.prototype.removePlace = function(index) {
+    if (this.places[index]) {
+      this.places.splice(index, 1);
+    }
+  };
+  
+  // UI Logic
   const addressBook = new AddressBook();
+  const placesList = new PlacesList();
   
   window.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('contact-form');
-    const list = document.getElementById('contacts-list');
+    // Address Book Form
+    const contactForm = document.getElementById('contact-form');
+    const contactsList = document.getElementById('contacts-list');
   
-    form.addEventListener('submit', function(event) {
-      event.preventDefault(preventDefault); // Stop page refresh
+    contactForm.addEventListener('submit', function(event) {
+      event.preventDefault();
   
       const nameInput = document.getElementById('name').value.trim();
       const emailInput = document.getElementById('email').value.trim();
@@ -39,30 +64,66 @@ function Contact(name, email, phone, address) {
         const newContact = new Contact(nameInput, emailInput, phoneInput, addressInput);
         addressBook.addContact(newContact);
         updateContacts();
-        form.reset(); // Clear form after adding
+        contactForm.reset();
       }
     });
   
     function updateContacts() {
-      list.innerHTML = ""; // Clear old list
+      contactsList.innerHTML = "";
       addressBook.contacts.forEach((contact, index) => {
         const li = document.createElement('li');
         li.textContent = `${contact.name} (${contact.phone})`;
   
-        // Show full details when clicked
         li.addEventListener('click', function() {
-          alert(
-            `Name: ${contact.name}\nEmail: ${contact.email}\nPhone: ${contact.phone}\nAddress: ${contact.address}`
-          );
+          alert(`Name: ${contact.name}\nEmail: ${contact.email}\nPhone: ${contact.phone}\nAddress: ${contact.address}`);
         });
   
-        // Delete contact when double-clicked
         li.addEventListener('dblclick', function() {
           addressBook.removeContact(index);
           updateContacts();
         });
   
-        list.appendChild(li);
+        contactsList.appendChild(li);
+      });
+    }
+  
+    // Places Form
+    const placeForm = document.getElementById('place-form');
+    const placesUl = document.getElementById('places-list');
+  
+    placeForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+  
+      const placeName = document.getElementById('place-name').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const landmarks = document.getElementById('landmarks').value.trim();
+      const season = document.getElementById('season').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+  
+      if (placeName && location && landmarks && season && notes) {
+        const newPlace = new Place(placeName, location, landmarks, season, notes);
+        placesList.addPlace(newPlace);
+        updatePlaces();
+        placeForm.reset();
+      }
+    });
+  
+    function updatePlaces() {
+      placesUl.innerHTML = "";
+      placesList.places.forEach((place, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${place.name} (${place.location})`;
+  
+        li.addEventListener('click', function() {
+          alert(`Place: ${place.name}\nLocation: ${place.location}\nLandmarks: ${place.landmarks}\nBest Season: ${place.season}\nNotes: ${place.notes}`);
+        });
+  
+        li.addEventListener('dblclick', function() {
+          placesList.removePlace(index);
+          updatePlaces();
+        });
+  
+        placesUl.appendChild(li);
       });
     }
   });
